@@ -1,39 +1,36 @@
-pipeline {
-  agent any
-  stages {
-      stage('Build'){
-
-        steps{
-            sh 'mvn clean package'
-          }
-        post {
-            success {
-               echo 'Now Archiving...'
-	       archiveArtifacts artifacts: '**/*.war'
-            }
-          }
-        }
-      stage('Deploy to Staging'){
-        steps{
-            build job:'j3-deploy2stg'
-          }
-        }
-      stage('Deploy to Production'){
-        steps{
-          timeout(time:4,unit:'DAYS'){
-             input message:'Provide Approval'
-             }
-          build job:'j5-deploy_prod'
-        }
-        post{
-            success{
-               echo 'Deployment Successful'
-               }
-            failure{
-               echo 'Deployment Failed'
-               }
-            }
-          
-        }
-  }
+pipeline{
+	agent any
+	parameters{
+	string(name: 'tcat',dafaultValue:'13.127.20.108',description:'Tomcat Server')
+	}
+	triggers{
+	pollSCM('* * * * *')
+	}
+	stages{
+		stage('Build'){
+			steps{
+				sh 'mvn clean package'
+			}
+			post{
+				success{
+					echo 'Archiving artifacts'
+					archivingArtifacts artifacts:'**/*.war'
+				}
+			}
+		}
+		stage('Deployment'){
+			parallel{
+				stage('Staging Deployment'){
+					steps{
+						sh 'scp **/*.war root@${params.tcat}:/root/tomcat/tcat-stg/webapps/.'
+				    }
+				}
+				stage('Production Deployment'){
+					steps{
+						sh 'scp **/*.war root@${params.tcat}:/root/tomcat/tomcat/webapps/.'
+				    }
+				}
+			}
+		}
+	}
 }
