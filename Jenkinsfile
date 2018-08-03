@@ -1,7 +1,7 @@
 pipeline{
 	agent any
 	parameters{
-	string(name: 'tcat',defaultValue:'13.127.20.108',description:'Tomcat Server')
+	string(name: 'tcat',defaultValue:'172.31.11.167',description:'Tomcat Server')
 	}
 	triggers{
 	pollSCM('* * * * *')
@@ -14,7 +14,7 @@ pipeline{
 			post{
 				success{
 					echo 'Archiving artifacts'
-					archiveArtifacts artifacts:'**/*.war'
+					archiveArtifacts artifacts:'**/target/*.war'
 				}
 			}
 		}
@@ -22,12 +22,12 @@ pipeline{
 			parallel{
 				stage('Staging Deployment'){
 					steps{
-						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tcat-stg/webapps/.'
+						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tcat-stg/webapps/'
 				    }
 				}
 				stage('Production Deployment'){
 					steps{
-						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tomcat/webapps/.'
+						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tomcat/webapps/'
 				    }
 				}
 			}
