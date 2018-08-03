@@ -1,7 +1,7 @@
 pipeline{
 	agent any
 	parameters{
-	string(name: 'tcat',dafaultValue:'13.127.20.108',description:'Tomcat Server')
+	string(name: 'tcat',defaultValue:'13.127.20.108',description:'Tomcat Server')
 	}
 	triggers{
 	pollSCM('* * * * *')
