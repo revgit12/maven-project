@@ -22,12 +22,12 @@ pipeline{
 			parallel{
 				stage('Staging Deployment'){
 					steps{
-						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tcat-stg/webapps/'
+						sh 'scp webapp/target/*.war root@${params.tcat}:/root/tomcat/tcat-stg/webapps/'
 				    }
 				}
 				stage('Production Deployment'){
 					steps{
-						sh 'scp **/target/*.war root@${params.tcat}:/root/tomcat/tomcat/webapps/'
+						sh 'scp webapp/target/*.war root@${params.tcat}:/root/tomcat/tomcat/webapps/'
 				    }
 				}
 			}
